@@ -38,10 +38,16 @@ export default class Nav extends Component {
                 </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link disabled" href="#">
-                  Disabled
-                </a>
+                <Link className="nav-link" to="/test">
+                  Functional Component
+                </Link>
               </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/todo">
+                  ToDo List
+                </Link>
+              </li>
+              
             </ul>
           </div>
         </nav>
