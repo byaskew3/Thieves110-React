@@ -9,6 +9,7 @@ import Test from './Test';
 import SignIn from './views/SignIn';
 import SignUp from './views/SignUp';
 import ChampionsCrud from './views/ChampionsCrud';
+import AuthState from './components/AuthState';
 
 export default class App extends Component {
   constructor(){

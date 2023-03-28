@@ -12,16 +12,18 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { db } from '../firebase'
-import { collection, addDoc } from 'firebase/firestore'
+import { auth, db } from '../firebase'
+import { doc, setDoc, getDoc } from 'firebase/firestore'
+
 
 const theme = createTheme();
 
 export default function SearchChampion() {
-
   const [champion, setChampion] = useState('')
   const [championData, setChampionData] = useState({})
 
+  
+  // fetching to specific champion/data
   const getChampionData = async (name) => {
 
     const response = await fetch(`https://ddragon.leagueoflegends.com/cdn/13.6.1/data/en_US/champion/${name}.json`)
@@ -36,34 +38,49 @@ export default function SearchChampion() {
       title: data.data[name].title,
       lore: data.data[name].lore,
       difficulty: data.data[name].info.difficulty,
+      type: data.data[name].tags[0],
       image: championImage.url
     })
   }
   
+  // add to our database
   useEffect(() => {
     const addToFirebase = async () => {
-      try {
-        const docRef = await addDoc(collection(db, "champions"), {
+        console.log(auth.currentUser.uid)
+        await setDoc(doc(db, "users", auth.currentUser.uid, "champions", championData.type), {
           name: championData.name,
           title: championData.title,
           lore: championData.lore,
           difficulty: championData.difficulty,
           image: championData.image
         });
-        console.log("Document written with ID: ", docRef.id);
-      } catch (e) {
-        console.error("Error adding document: ", e);
-      }
     }
-    addToFirebase()
+    if(Object.keys(championData).length !== 0){
+      console.log('added to firebase')
+      addToFirebase()
+    }
   }, [championData])
 
+  // handles our search
   const handleSubmit = (event) => {
     event.preventDefault();
     const titleChampion = champion[0].toUpperCase() + champion.slice(1,).toLowerCase()
     getChampionData(titleChampion)
     console.log(championData)
   };
+
+  // Get current team
+  const getCurrentTeam = async () => {
+    const docRef = doc(db, "users", auth.currentUser.uid)
+    const docSnap = await getDoc(docRef)
+
+    if (docSnap.exists()) {
+      console.log(docSnap)
+      console.log(docSnap.data())
+    } else {
+      console.log('No such document')
+    }
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -98,10 +115,19 @@ export default function SearchChampion() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Search
+              Add to Team
+            </Button>
+            <Button
+              onClick={getCurrentTeam}
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Get Current Team
             </Button>
           </Box>
         </Box>
+        <img src={championData.image}/>
       </Container>
     </ThemeProvider>
   );
