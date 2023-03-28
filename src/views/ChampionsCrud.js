@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { auth, db } from '../firebase'
-import { doc, setDoc, getDoc } from 'firebase/firestore'
+import { doc, setDoc, onSnapshot, collection} from 'firebase/firestore'
 
 
 const theme = createTheme();
@@ -71,15 +71,12 @@ export default function SearchChampion() {
 
   // Get current team
   const getCurrentTeam = async () => {
-    const docRef = doc(db, "users", auth.currentUser.uid)
-    const docSnap = await getDoc(docRef)
-
-    if (docSnap.exists()) {
-      console.log(docSnap)
-      console.log(docSnap.data())
-    } else {
-      console.log('No such document')
-    }
+    const subColRef = collection(db, "users", auth.currentUser.uid, "champions")
+    onSnapshot(subColRef, (querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        console.log(doc.data())
+      })
+    })
   }
 
   return (
