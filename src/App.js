@@ -8,6 +8,8 @@ import Feed from './views/Feed';
 import Test from './Test';
 import SignIn from './views/SignIn';
 import SignUp from './views/SignUp';
+import ChampionsCrud from './views/ChampionsCrud';
+import AuthState from './components/AuthState';
 
 export default class App extends Component {
   constructor(){
@@ -40,6 +42,7 @@ export default class App extends Component {
             <Route path='/test' element={<Test age={this.state.age} addOne={this.addOne}/>}/>
             <Route path='/login' element={<SignIn/>}/>
             <Route path='/signup' element={<SignUp/>}/>
+            <Route path='/champions' element={<ChampionsCrud/>}/>
           </Routes>
         </div>
       </BrowserRouter>

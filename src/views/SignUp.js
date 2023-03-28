@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,39 +12,24 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { auth } from '../firebase'
+import { auth, db } from '../firebase'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://codingtemple.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import { setDoc, doc } from 'firebase/firestore'
 
 const theme = createTheme();
 
 export default function SignUp() {
 
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [displayName, setDisplayName] = useState('')
+  
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [displayName, setDisplayName] = useState('')
+  const [user, setUser] = useState({})
+
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-
-    console.log(email, password)
+    
     createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
     // Signed in 
@@ -53,13 +38,27 @@ export default function SignUp() {
         updateProfile(auth.currentUser, {
             displayName: displayName
           })
+        // adding user info for our db
+        const data = {
+          uid: user.uid,
+          email: user.email,
+        }
+        setUser(data)
     })
-    .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ..
-    });
   };
+
+  useEffect(() => {
+      // firebase functionality
+      const addUserToFirebase = async () => {
+        await setDoc(doc(db, "users", user.uid), {
+          id: user.uid,
+          email: user.email
+        })
+      }
+      if(Object.keys(user).length > 0){
+        addUserToFirebase()
+      }
+  }, [user])
 
   return (
     <ThemeProvider theme={theme}>
@@ -126,12 +125,6 @@ export default function SignUp() {
                   onChange={(event) => {setPassword(event.target.value)}}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid>
             </Grid>
             <Button
               type="submit"
@@ -150,7 +143,6 @@ export default function SignUp() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
       </Container>
     </ThemeProvider>
   );

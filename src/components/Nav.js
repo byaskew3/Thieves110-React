@@ -44,6 +44,11 @@ export default class Nav extends Component {
                   </Link>
                 </li>
                 <li className="nav-item">
+                  <Link className="nav-link" to="/champions">
+                    League Champions
+                  </Link>
+                </li>
+                <li className="nav-item">
                   <Link className="nav-link" to="/login">
                     Login
                   </Link>

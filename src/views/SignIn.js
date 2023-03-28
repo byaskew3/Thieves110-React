@@ -15,19 +15,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { auth } from '../firebase'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
 const theme = createTheme();
 
 export default function SignIn() {
@@ -37,18 +24,12 @@ export default function SignIn() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-
+    
     signInWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
+    .then((userCredential) => {
     // Signed in 
     const user = userCredential.user;
     console.log(user)
-    // ...
   })
   .catch((error) => {
     const errorCode = error.code;
@@ -101,10 +82,6 @@ export default function SignIn() {
               autoComplete="current-password"
               onChange={(event) => {setPassword(event.target.value)}}
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button
               type="submit"
               fullWidth
@@ -122,7 +99,6 @@ export default function SignIn() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
     </ThemeProvider>
   );
