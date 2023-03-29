@@ -1,19 +1,15 @@
 import { useEffect, useState } from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { auth, db } from '../firebase'
 import { doc, setDoc, onSnapshot, collection} from 'firebase/firestore'
+import ChampionCard from '../components/ChampionCard';
 
 
 const theme = createTheme();
@@ -21,6 +17,7 @@ const theme = createTheme();
 export default function SearchChampion() {
   const [champion, setChampion] = useState('')
   const [championData, setChampionData] = useState({})
+  const [championArr, setChampionArr] = useState([])
 
   
   // fetching to specific champion/data
@@ -52,6 +49,7 @@ export default function SearchChampion() {
           title: championData.title,
           lore: championData.lore,
           difficulty: championData.difficulty,
+          type: championData.type,
           image: championData.image
         });
     }
@@ -71,12 +69,17 @@ export default function SearchChampion() {
 
   // Get current team
   const getCurrentTeam = async () => {
-    const subColRef = collection(db, "users", auth.currentUser.uid, "champions")
-    onSnapshot(subColRef, (querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        console.log(doc.data())
+    const teamArr = []
+    if(championArr.length === 0){
+      const subColRef = collection(db, "users", auth.currentUser.uid, "champions")
+      onSnapshot(subColRef, (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          console.log(doc.data())
+          teamArr.push(doc.data())
+        })
+        setChampionArr(championArr.concat(teamArr))
       })
-    })
+    }
   }
 
   return (
@@ -124,8 +127,16 @@ export default function SearchChampion() {
             </Button>
           </Box>
         </Box>
-        <img src={championData.image}/>
       </Container>
+        <Grid container spacing={2}>
+          {championArr.map((champion) => {
+            return (
+              <Grid item xs={12} md key={champion.name}>
+                <ChampionCard champion={champion}/>
+              </Grid>
+            )
+          })}
+        </Grid>
     </ThemeProvider>
   );
 }
