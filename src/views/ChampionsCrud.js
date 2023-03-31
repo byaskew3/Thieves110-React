@@ -56,7 +56,10 @@ export default function SearchChampion() {
     if(Object.keys(championData).length !== 0){
       console.log('added to firebase')
       addToFirebase()
+    
+    
     }
+    getCurrentTeam()
   }, [championData])
 
   // handles our search
@@ -69,17 +72,16 @@ export default function SearchChampion() {
 
   // Get current team
   const getCurrentTeam = async () => {
+    console.log('getting team')
     const teamArr = []
-    if(championArr.length === 0){
       const subColRef = collection(db, "users", auth.currentUser.uid, "champions")
       onSnapshot(subColRef, (querySnapshot) => {
         querySnapshot.forEach((doc) => {
           console.log(doc.data())
           teamArr.push(doc.data())
         })
-        setChampionArr(championArr.concat(teamArr))
+        setChampionArr(teamArr)
       })
-    }
   }
 
   return (
@@ -132,7 +134,7 @@ export default function SearchChampion() {
           {championArr.map((champion) => {
             return (
               <Grid item xs={12} md key={champion.name}>
-                <ChampionCard champion={champion}/>
+                <ChampionCard champion={champion} getCurrentTeam={getCurrentTeam}/>
               </Grid>
             )
           })}
