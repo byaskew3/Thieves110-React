@@ -1,9 +1,12 @@
-import React, { Component } from "react";
+import React, { useContext } from "react";
 import { Link } from 'react-router-dom'
 import AuthState from "./AuthState";
+import { AppContext } from "../context/AppContext";
 
-export default class Nav extends Component {
-  render() {
+
+export default function Nav(){
+    const {favPoke} = useContext(AppContext)
+
     return (
       <div>
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -63,8 +66,13 @@ export default class Nav extends Component {
               </li>
             </ul>
           </div>
+          <div>
+            {favPoke ? 
+            <p>My fav Champ is {favPoke}</p>: <></>
+              }
+          </div>
+
         </nav>
       </div>
     );
-  }
 }
